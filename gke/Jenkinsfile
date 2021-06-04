@@ -19,7 +19,7 @@ pipeline {
     environment {
         PROJECT_ZONE = "${JENK_INT_IT_ZONE}"
         PROJECT_ID = "${JENK_INT_IT_PROJECT_ID}"
-        DEV_CLUSTER = "${JENK_INT_IT_DEV}"
+        DEV_CLUSTER = "${JENK_INT_IT_STAGING}"
         BUILD_CONTEXT_BUCKET = "${JENK_INT_IT_BUCKET}"
         BUILD_CONTEXT = "build-context-${BUILD_ID}.tar.gz"
         APP_NAME = "capstoneproject"
