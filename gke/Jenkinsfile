@@ -18,9 +18,9 @@ pipeline {
 
     environment {
         PROJECT_ZONE = "${JENK_INT_IT_ZONE}"
-        PROJECT_ID = "${JENK_INT_IT_PROJECT_ID_DEV}"
+        PROJECT_ID = "${JENK_INT_IT_PROJECT_ID}"
         DEV_CLUSTER = "${JENK_INT_IT_DEV}"
-        BUILD_CONTEXT_BUCKET = "${JENK_INT_IT_BUCKET_DEV}"
+        BUILD_CONTEXT_BUCKET = "${JENK_INT_IT_BUCKET}"
         BUILD_CONTEXT = "build-context-${BUILD_ID}.tar.gz"
         APP_NAME = "capstoneproject"
         GCR_IMAGE = "gcr.io/${PROJECT_ID}/${APP_NAME}:${BUILD_ID}"
