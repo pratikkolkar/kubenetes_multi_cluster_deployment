@@ -18,18 +18,19 @@ pipeline {
 
     environment {
         PROJECT_ZONE = "${JENK_INT_IT_ZONE}"
-        PROJECT_ID = "${JENK_INT_IT_PROJECT_ID_DEV}"
-        DEV_CLUSTER = "${JENK_INT_IT_DEV}"
-        BUILD_CONTEXT_BUCKET = "${JENK_INT_IT_BUCKET_DEV}"
+        PROJECT_ID = "${JENK_INT_IT_PROJECT_ID}"
+        STAGING_CLUSTER = "${JENK_INT_IT_STAGING}"
+        PROD_CLUSTER = "${JENK_INT_IT_PROD}"
+        BUILD_CONTEXT_BUCKET = "${JENK_INT_IT_BUCKET}"
         BUILD_CONTEXT = "build-context-${BUILD_ID}.tar.gz"
         APP_NAME = "capstoneproject"
         GCR_IMAGE = "gcr.io/${PROJECT_ID}/${APP_NAME}:${BUILD_ID}"
-		SONAR = "${PROJECT_ID}/${APP_NAME}/${BRANCH}:${BUILD_ID}"
+	 SONAR = "${PROJECT_ID}/${APP_NAME}/${BRANCH}:${BUILD_ID}"
         APP_JAR = "${APP_NAME}.war"
     }
 
     stages {
-        stage("Build and test") {
+        stage("Build and Test") {
 	    agent {
     	    	kubernetes {
       		    cloud 'kubernetes'
@@ -47,11 +48,11 @@ pipeline {
 		        sh "mvn verify"
 			    junit 'target/surefire-reports/*xml'
 		        
-				// bundle the generated artifact    
+			// bundle the generated artifact    
 		        sh "cp target/${APP_NAME}-*.war $APP_JAR"
 			    
 					
-   	     		withSonarQubeEnv('sonar') {
+				withSonarQubeEnv('sonar') {
 				sh "mvn sonar:sonar -Dsonar.projectVersion=${SONAR}"
               	   			 }
 				
@@ -84,7 +85,7 @@ pipeline {
 		}
 	    }
 	}
-	stage("Deploy to Dev") {
+	stage("Deploy to staging") {
             agent {
     	        kubernetes {
       		    cloud 'kubernetes'
@@ -95,12 +96,35 @@ pipeline {
 	    steps{
 		container('gke-deploy') {
 		    sh "sed -i s#IMAGE#${GCR_IMAGE}#g gke/kubernetes/manifest.yaml"
-                    step([$class: 'KubernetesEngineBuilder', projectId: env.PROJECT_ID, clusterName: env.DEV_CLUSTER, location: env.PROJECT_ZONE, manifestPattern: 'gke/kubernetes/manifest.yaml', credentialsId: env.JENK_INT_IT_CRED_ID, verifyDeployments: true])
+                    step([$class: 'KubernetesEngineBuilder', projectId: env.PROJECT_ID, clusterName: env.STAGING_CLUSTER, location: env.PROJECT_ZONE, manifestPattern: 'gke/kubernetes/manifest.yaml', credentialsId: env.JENK_INT_IT_CRED_ID, verifyDeployments: true])
 		}
             }
 	}
-       
-
+        
+         // This stage simulates an SRE manual approval process. Should you want to incorporate
+         // this into your pipeline you can uncomment this stage.
+        stage('Wait for SRE Approval') {
+            steps{
+                timeout(time:12, unit:'HOURS') {
+                    input message:'Approve deployment?'
+                }
+            }
+        }
+         
+	stage("Deploy to prod") {
+            agent {
+    	        kubernetes {
+      		    cloud 'kubernetes'
+      		    label 'gke-deploy'
+		    yamlFile 'gke/jenkins/gke-deploy-pod.yaml'
+		}
+            }
+	    steps{
+		container('gke-deploy') {
+		    sh "sed -i s#IMAGE#${GCR_IMAGE}#g gke/kubernetes/manifest.yaml"
+                    step([$class: 'KubernetesEngineBuilder', projectId: env.PROJECT_ID, clusterName: env.PROD_CLUSTER, location: env.PROJECT_ZONE, manifestPattern: 'gke/kubernetes/manifest.yaml', credentialsId: env.JENK_INT_IT_CRED_ID, verifyDeployments: true])
+		}
+            }	
 	}
     }
 }
