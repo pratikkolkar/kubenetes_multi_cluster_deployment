@@ -52,9 +52,6 @@ pipeline {
 		        sh "cp target/${APP_NAME}-*.war $APP_JAR"
 			    
 					
-				withSonarQubeEnv('sonar') {
-				sh "mvn sonar:sonar -Dsonar.projectVersion=${SONAR}"
-              	   			 }
 				
 
 		        // archive the build context for kaniko			    
@@ -85,24 +82,7 @@ pipeline {
 		}
 	    }
 	}
-	stage("Deploy to staging") {
-            agent {
-    	        kubernetes {
-      		    cloud 'kubernetes'
-      		    label 'gke-deploy'
-		    yamlFile 'gke/jenkins/gke-deploy-pod.yaml'
-		}
-            }
-	    steps{
-		container('gke-deploy') {
-		    sh "sed -i s#IMAGE#${GCR_IMAGE}#g gke/kubernetes/manifest.yaml"
-                    step([$class: 'KubernetesEngineBuilder', projectId: env.PROJECT_ID, clusterName: env.STAGING_CLUSTER, location: env.PROJECT_ZONE, manifestPattern: 'gke/kubernetes/manifest.yaml', credentialsId: env.JENK_INT_IT_CRED_ID, verifyDeployments: true])
-		}
-            }
-	}
-        
-         // This stage simulates an SRE manual approval process. Should you want to incorporate
-         // this into your pipeline you can uncomment this stage.
+	
         stage('Wait for SRE Approval') {
             steps{
                 timeout(time:12, unit:'HOURS') {
