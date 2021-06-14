@@ -22,7 +22,7 @@ pipeline {
         DEV_CLUSTER = "${JENK_INT_IT_STAGING}"
         BUILD_CONTEXT_BUCKET = "${JENK_INT_IT_BUCKET}"
         BUILD_CONTEXT = "build-context-${BUILD_ID}.tar.gz"
-        APP_NAME = "Capstoneproject"
+        APP_NAME = "capstoneproject"
         GCR_IMAGE = "gcr.io/${PROJECT_ID}/${APP_NAME}:${BUILD_ID}"
 		SONAR = "${PROJECT_ID}/${APP_NAME}/${BRANCH}:${BUILD_ID}"
         APP_JAR = "${APP_NAME}.war"
