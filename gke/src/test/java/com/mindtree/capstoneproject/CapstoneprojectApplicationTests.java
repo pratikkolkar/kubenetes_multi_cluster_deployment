@@ -9,5 +9,13 @@ class CapstoneprojectApplicationTests {
 	@Test
 	void contextLoads() {
 	}
+	
+	 @Test 
+	public void test1() {
+    	}
+
+    	@Test 
+	public void test2() {
+   	 }
 
 }
