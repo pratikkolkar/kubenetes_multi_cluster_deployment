@@ -15,19 +15,19 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: Capstoneproject
+  name: capstoneproject
 spec:
   selector:
     matchLabels:
-      app: Capstoneproject
+      app: capstoneproject
   replicas: 2
   template:
     metadata:
       labels:
-        app: Capstoneproject
+        app: capstoneproject
     spec:
       containers:
-      - name: Capstoneproject
+      - name: capstoneproject
         image: IMAGE
         ports:
         - containerPort: 80
