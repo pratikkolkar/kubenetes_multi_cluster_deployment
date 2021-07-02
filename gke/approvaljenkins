@@ -1,0 +1,41 @@
+pipeline {
+  agent none
+  stages {
+    stage('one') {
+         when {
+        expression { myVar == 'initial_value' }
+      }
+      steps {
+        echo "1.1. ${myVar}" // prints '1.1. initial_value'
+      }
+    }
+    stage('two') {
+         when {
+        expression { myVar == 'initial_value' }
+      }
+      steps {
+        echo "2.1 ${myVar}" 
+      }
+    }
+    stage('Wait for SRE Approval') {
+         when {
+        expression { myVar == 'initial_value' }
+      }
+            steps{
+            script {
+                    def deploymentDelay = input id: 'Deploy', message: 'choose env variable?', parameters: [choice(choices: ['dev', 'qa', 'prod'], description: 'which env do you want to deploy?', name: 'deploymentDelay')]
+                }
+                build job: 'approvaljob', parameters: [string(name: 'myVar', value: 'initial')]
+            }
+        }
+    // this stage is skipped due to the when expression, so nothing is printed
+    stage('three') {
+      when {
+        expression { myVar != 'initial_value' }
+      }
+      steps {
+        echo "2.2 ${myVar}" 
+      }
+    }
+  }
+}
