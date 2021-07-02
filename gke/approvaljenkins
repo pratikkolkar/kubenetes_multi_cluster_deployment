@@ -1,5 +1,9 @@
 pipeline {
   agent none
+   parameters {
+    string(name: 'myVar', defaultValue: 'initial_value', description: 'index value')
+  }
+  
   stages {
     stage('one') {
          when {
