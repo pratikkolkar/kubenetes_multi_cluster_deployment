@@ -31,7 +31,7 @@ pipeline {
             script {
                     def deploymentDelay = input id: 'Deploy', message: 'choose env variable?', parameters: [choice(choices: ['dev', 'qa', 'prod'], description: 'which env do you want to deploy?', name: 'deploymentDelay')]
                 }
-                build job: 'approvalworkflow', parameters: [string(name: 'myVar', value: 'initial')]
+                build job: 'dev', parameters: [string(name: 'myVar', value: 'initial')]
             }
         }
     // this stage is skipped due to the when expression, so nothing is printed
