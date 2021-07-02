@@ -7,9 +7,6 @@ pipeline {
   
   stages {
     stage('one') {
-         when {
-        expression { myVar == 'initial_value' }
-      }
       steps {
         build job: 'dev', parameters: [string(name: 'myVar', value: 'initial_value')]
         echo "1.1. ${myVar}" // prints '1.1. initial_value'
