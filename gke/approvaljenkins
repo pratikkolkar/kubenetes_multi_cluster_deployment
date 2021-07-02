@@ -1,14 +1,13 @@
 pipeline {
   agent none
    parameters {
-    string(name: 'myVar', defaultValue: 'initial_value', description: 'index value')
+    string(name: 'myVar', defaultValue: 'initial_value', description: 'query value')
   }
-  
   
   stages {
     stage('one') {
       steps {
-        build job: 'dev', parameters: [string(name: 'myVar', value: 'initial_value')]
+        
         echo "1.1. ${myVar}" // prints '1.1. initial_value'
       }
     }
