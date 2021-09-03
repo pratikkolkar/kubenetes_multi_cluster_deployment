@@ -25,7 +25,10 @@ pipeline {
       }
             steps{
             script {
+            timeout(time: 400, unit: 'MILLISECONDS'){
                     def deploymentDelay = input id: 'Deploy', message: 'choose env variable?', parameters: [choice(choices: ['dev', 'qa', 'prod'], description: 'which env do you want to deploy?', name: 'deploymentDelay')]
+                
+                }
                 }
                 build job: 'dev', parameters: [string(name: 'myVar', value: 'initial')]
             }
